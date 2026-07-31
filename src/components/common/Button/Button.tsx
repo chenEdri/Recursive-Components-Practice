@@ -1,17 +1,18 @@
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import styles from './Button.module.scss'
-import type { ButtonProps, ButtonSize } from './types'
+import { ButtonSize, ButtonVariant } from './constants'
+import type { ButtonProps } from './types'
 
 const spinnerSizes: Record<ButtonSize, number> = {
-  sm: 14,
-  md: 16,
-  lg: 18,
+  [ButtonSize.SM]: 14,
+  [ButtonSize.MD]: 16,
+  [ButtonSize.LG]: 18,
 }
 
 export function Button({
-  variant = 'primary',
-  size = 'md',
+  variant = ButtonVariant.PRIMARY,
+  size = ButtonSize.MD,
   isLoading = false,
   disabled,
   className,

@@ -1,23 +1,24 @@
+import { NodeType } from './constants'
 import type { FileSystemNode } from './types'
 
 export const initialData: FileSystemNode = {
   id: 'root',
   name: 'Root',
-  type: 'folder',
+  type: NodeType.FOLDER,
   children: [
     {
       id: 'src',
       name: 'src',
-      type: 'folder',
+      type: NodeType.FOLDER,
       children: [
-        { id: 'index.ts', name: 'index.ts', type: 'file' },
-        { id: 'app.tsx', name: 'app.tsx', type: 'file' },
+        { id: 'index.ts', name: 'index.ts', type: NodeType.FILE },
+        { id: 'app.tsx', name: 'app.tsx', type: NodeType.FILE },
       ],
     },
     {
       id: 'package.json',
       name: 'package.json',
-      type: 'file',
+      type: NodeType.FILE,
     },
   ],
 }

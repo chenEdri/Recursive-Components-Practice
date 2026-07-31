@@ -1,8 +1,9 @@
-import type { FileSystemNode, NodeType } from './types'
+import { NEW_NODE_TITLE, NodeType } from './constants'
+import type { FileSystemNode } from './types'
 
 export function insertChild(root: FileSystemNode, parentId: string, newNode: FileSystemNode): FileSystemNode {
   if (root.id === parentId) {
-    if (root.type !== 'folder') return root
+    if (root.type !== NodeType.FOLDER) return root
     return { ...root, children: [...(root.children ?? []), newNode] }
   }
 
@@ -30,7 +31,7 @@ export function findNode(root: FileSystemNode, id: string): FileSystemNode | und
 }
 
 function defaultNameBase(type: NodeType): string {
-  return type === 'file' ? 'New File' : 'New Folder'
+  return NEW_NODE_TITLE[type]
 }
 
 export function countDefaultNamedChildren(folder: FileSystemNode, type: NodeType): number {

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { KeyboardEvent } from 'react'
-import { Button } from '@/components/common/Button'
+import { Button, ButtonSize, ButtonVariant } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import styles from './PromptDialog.module.scss'
 import type { PromptDialogProps } from './types'
@@ -44,10 +44,15 @@ export function PromptDialog({
         autoFocus
       />
       <div className={styles.actions}>
-        <Button variant="secondary" size="sm" onClick={onCancel}>
+        <Button variant={ButtonVariant.SECONDARY} size={ButtonSize.SM} onClick={onCancel}>
           {cancelText}
         </Button>
-        <Button variant="primary" size="sm" disabled={isInvalid} onClick={handleSubmit}>
+        <Button
+          variant={ButtonVariant.PRIMARY}
+          size={ButtonSize.SM}
+          disabled={isInvalid}
+          onClick={handleSubmit}
+        >
           {confirmText}
         </Button>
       </div>

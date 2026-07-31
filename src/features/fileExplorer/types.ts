@@ -1,4 +1,4 @@
-export type NodeType = 'file' | 'folder'
+import type { FileExplorerActionType, NodeType } from './constants'
 
 export interface FileSystemNode {
   id: string
@@ -14,6 +14,6 @@ export interface FileExplorerState {
 }
 
 export type FileExplorerAction =
-  | { type: 'TOGGLE_EXPAND'; id: string }
-  | { type: 'SELECT_NODE'; id: string }
-  | { type: 'ADD_NODE'; parentId: string; nodeType: NodeType; name: string }
+  | { type: typeof FileExplorerActionType.TOGGLE_EXPAND; id: string }
+  | { type: typeof FileExplorerActionType.SELECT_NODE; id: string }
+  | { type: typeof FileExplorerActionType.ADD_NODE; parentId: string; nodeType: NodeType; name: string }

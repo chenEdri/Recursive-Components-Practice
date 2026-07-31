@@ -1,9 +1,10 @@
 import { useEffect, useReducer } from 'react'
 import { popupService } from '@/services/popupService'
 import { treeStorageService } from '@/services/treeStorageService'
+import { FileExplorerActionType, NEW_NODE_TITLE, NODE_NAME_FIELD_LABEL, NodeType } from './constants'
 import { initialData } from './data'
 import { countDefaultNamedChildren, defaultName, findNode, insertChild } from './helpers'
-import type { FileExplorerAction, FileExplorerState, FileSystemNode, NodeType } from './types'
+import type { FileExplorerAction, FileExplorerState, FileSystemNode } from './types'
 
 const initialState: FileExplorerState = {
   tree: initialData,
@@ -13,7 +14,7 @@ const initialState: FileExplorerState = {
 
 function fileTreeReducer(state: FileExplorerState, action: FileExplorerAction): FileExplorerState {
   switch (action.type) {
-    case 'TOGGLE_EXPAND': {
+    case FileExplorerActionType.TOGGLE_EXPAND: {
       const next = new Set(state.expandedIds)
       if (next.has(action.id)) {
         next.delete(action.id)
@@ -22,17 +23,17 @@ function fileTreeReducer(state: FileExplorerState, action: FileExplorerAction): 
       }
       return { ...state, expandedIds: next }
     }
-    case 'SELECT_NODE':
+    case FileExplorerActionType.SELECT_NODE:
       return { ...state, selectedId: action.id }
-    case 'ADD_NODE': {
+    case FileExplorerActionType.ADD_NODE: {
       const parent = findNode(state.tree, action.parentId)
-      if (!parent || parent.type !== 'folder') return state
+      if (!parent || parent.type !== NodeType.FOLDER) return state
 
       const newNode: FileSystemNode = {
         id: crypto.randomUUID(),
         name: action.name,
         type: action.nodeType,
-        ...(action.nodeType === 'folder' ? { children: [] } : {}),
+        ...(action.nodeType === NodeType.FOLDER ? { children: [] } : {}),
       }
 
       return {
@@ -64,14 +65,14 @@ export function useFileTreeManager() {
     const suggested = defaultName(nodeType, countDefaultNamedChildren(selectedNode, nodeType))
 
     const name = await popupService.prompt({
-      title: nodeType === 'file' ? 'New File' : 'New Folder',
-      label: nodeType === 'file' ? 'File name' : 'Folder name',
+      title: NEW_NODE_TITLE[nodeType],
+      label: NODE_NAME_FIELD_LABEL[nodeType],
       defaultValue: suggested,
       confirmText: 'Create',
     })
     if (name === null) return
 
-    dispatch({ type: 'ADD_NODE', parentId, nodeType, name: name.trim() })
+    dispatch({ type: FileExplorerActionType.ADD_NODE, parentId, nodeType, name: name.trim() })
   }
 
   return {
@@ -79,10 +80,10 @@ export function useFileTreeManager() {
     expandedIds: state.expandedIds,
     selectedId: state.selectedId,
     selectedNode,
-    canAddToSelection: selectedNode?.type === 'folder',
-    toggleExpand: (id: string) => dispatch({ type: 'TOGGLE_EXPAND', id }),
-    selectNode: (id: string) => dispatch({ type: 'SELECT_NODE', id }),
-    addFile: () => addNode('file'),
-    addFolder: () => addNode('folder'),
+    canAddToSelection: selectedNode?.type === NodeType.FOLDER,
+    toggleExpand: (id: string) => dispatch({ type: FileExplorerActionType.TOGGLE_EXPAND, id }),
+    selectNode: (id: string) => dispatch({ type: FileExplorerActionType.SELECT_NODE, id }),
+    addFile: () => addNode(NodeType.FILE),
+    addFolder: () => addNode(NodeType.FOLDER),
   }
 }
