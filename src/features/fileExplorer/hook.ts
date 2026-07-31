@@ -1,4 +1,5 @@
-import { useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
+import { treeStorageService } from '@/services/treeStorageService'
 import { initialData } from './data'
 import { countDefaultNamedChildren, defaultName, findNode, insertChild } from './helpers'
 import type { FileExplorerAction, FileExplorerState, FileSystemNode } from './types'
@@ -45,8 +46,16 @@ function fileTreeReducer(state: FileExplorerState, action: FileExplorerAction): 
 }
 
 export function useFileTreeManager() {
-  const [state, dispatch] = useReducer(fileTreeReducer, initialState)
+  const [state, dispatch] = useReducer(
+    fileTreeReducer,
+    undefined,
+    () => treeStorageService.loadState() ?? initialState,
+  )
   const selectedNode = state.selectedId ? findNode(state.tree, state.selectedId) : undefined
+
+  useEffect(() => {
+    treeStorageService.saveState(state)
+  }, [state])
 
   return {
     tree: state.tree,
