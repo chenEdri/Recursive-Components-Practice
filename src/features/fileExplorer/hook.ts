@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from 'react'
+import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import { popupService } from '@/services/popupService'
 import { treeStorageService } from '@/services/treeStorageService'
 import { FileExplorerActionType, NEW_NODE_TITLE, NODE_NAME_FIELD_LABEL, NodeType } from './constants'
@@ -36,10 +36,14 @@ function fileTreeReducer(state: FileExplorerState, action: FileExplorerAction): 
         ...(action.nodeType === NodeType.FOLDER ? { children: [] } : {}),
       }
 
+      const expandedIds = state.expandedIds.has(action.parentId)
+        ? state.expandedIds
+        : new Set(state.expandedIds).add(action.parentId)
+
       return {
         ...state,
         tree: insertChild(state.tree, action.parentId, newNode),
-        expandedIds: new Set(state.expandedIds).add(action.parentId),
+        expandedIds,
       }
     }
     default:
@@ -53,7 +57,10 @@ export function useFileTreeManager() {
     undefined,
     () => treeStorageService.loadState() ?? initialState,
   )
-  const selectedNode = state.selectedId ? findNode(state.tree, state.selectedId) : undefined
+  const selectedNode = useMemo(
+    () => (state.selectedId ? findNode(state.tree, state.selectedId) : undefined),
+    [state.tree, state.selectedId],
+  )
 
   useEffect(() => {
     treeStorageService.saveState(state)
@@ -76,14 +83,17 @@ export function useFileTreeManager() {
     dispatch({ type: FileExplorerActionType.ADD_NODE, parentId, nodeType, name: name.trim() })
   }
 
+  const toggleExpand = useCallback((id: string) => dispatch({ type: FileExplorerActionType.TOGGLE_EXPAND, id }), [])
+  const selectNode = useCallback((id: string) => dispatch({ type: FileExplorerActionType.SELECT_NODE, id }), [])
+
   return {
     tree: state.tree,
     expandedIds: state.expandedIds,
     selectedId: state.selectedId,
     selectedNode,
     canAddToSelection: selectedNode?.type === NodeType.FOLDER,
-    toggleExpand: (id: string) => dispatch({ type: FileExplorerActionType.TOGGLE_EXPAND, id }),
-    selectNode: (id: string) => dispatch({ type: FileExplorerActionType.SELECT_NODE, id }),
+    toggleExpand,
+    selectNode,
     addFile: () => addNode(NodeType.FILE),
     addFolder: () => addNode(NodeType.FOLDER),
   }

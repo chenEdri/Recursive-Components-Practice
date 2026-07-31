@@ -1,10 +1,10 @@
-import type { CSSProperties, MouseEvent } from 'react'
+import { memo, type CSSProperties, type MouseEvent } from 'react'
 import { cn } from '@/utils/cn'
 import { COLLAPSE_ICON, EXPAND_ICON, NodeType } from '../constants'
 import styles from './styles.module.scss'
 import type { FileTreeNodeProps } from './types'
 
-export function FileTreeNode({ node, depth, expandedIds, selectedId, onToggle, onSelect }: FileTreeNodeProps) {
+function FileTreeNodeComponent({ node, depth, expandedIds, selectedId, onToggle, onSelect }: FileTreeNodeProps) {
   const isFolder = node.type === NodeType.FOLDER
   const isExpanded = expandedIds.has(node.id)
   const isSelected = selectedId === node.id
@@ -50,3 +50,5 @@ export function FileTreeNode({ node, depth, expandedIds, selectedId, onToggle, o
     </div>
   )
 }
+
+export const FileTreeNode = memo(FileTreeNodeComponent)
