@@ -1,8 +1,9 @@
 import { useEffect, useReducer } from 'react'
+import { popupService } from '@/services/popupService'
 import { treeStorageService } from '@/services/treeStorageService'
 import { initialData } from './data'
 import { countDefaultNamedChildren, defaultName, findNode, insertChild } from './helpers'
-import type { FileExplorerAction, FileExplorerState, FileSystemNode } from './types'
+import type { FileExplorerAction, FileExplorerState, FileSystemNode, NodeType } from './types'
 
 const initialState: FileExplorerState = {
   tree: initialData,
@@ -29,7 +30,7 @@ function fileTreeReducer(state: FileExplorerState, action: FileExplorerAction): 
 
       const newNode: FileSystemNode = {
         id: crypto.randomUUID(),
-        name: defaultName(action.nodeType, countDefaultNamedChildren(parent, action.nodeType)),
+        name: action.name,
         type: action.nodeType,
         ...(action.nodeType === 'folder' ? { children: [] } : {}),
       }
@@ -57,6 +58,22 @@ export function useFileTreeManager() {
     treeStorageService.saveState(state)
   }, [state])
 
+  const addNode = async (nodeType: NodeType) => {
+    if (!selectedNode) return
+    const parentId = selectedNode.id
+    const suggested = defaultName(nodeType, countDefaultNamedChildren(selectedNode, nodeType))
+
+    const name = await popupService.prompt({
+      title: nodeType === 'file' ? 'New File' : 'New Folder',
+      label: nodeType === 'file' ? 'File name' : 'Folder name',
+      defaultValue: suggested,
+      confirmText: 'Create',
+    })
+    if (name === null) return
+
+    dispatch({ type: 'ADD_NODE', parentId, nodeType, name: name.trim() })
+  }
+
   return {
     tree: state.tree,
     expandedIds: state.expandedIds,
@@ -65,7 +82,7 @@ export function useFileTreeManager() {
     canAddToSelection: selectedNode?.type === 'folder',
     toggleExpand: (id: string) => dispatch({ type: 'TOGGLE_EXPAND', id }),
     selectNode: (id: string) => dispatch({ type: 'SELECT_NODE', id }),
-    addFile: () => selectedNode && dispatch({ type: 'ADD_NODE', parentId: selectedNode.id, nodeType: 'file' }),
-    addFolder: () => selectedNode && dispatch({ type: 'ADD_NODE', parentId: selectedNode.id, nodeType: 'folder' }),
+    addFile: () => addNode('file'),
+    addFolder: () => addNode('folder'),
   }
 }
