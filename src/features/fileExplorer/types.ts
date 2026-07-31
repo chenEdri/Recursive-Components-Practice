@@ -16,4 +16,4 @@ export interface FileExplorerState {
 export type FileExplorerAction =
   | { type: 'TOGGLE_EXPAND'; id: string }
   | { type: 'SELECT_NODE'; id: string }
-  | { type: 'ADD_NODE'; parentId: string; nodeType: NodeType }
+  | { type: 'ADD_NODE'; parentId: string; nodeType: NodeType; name: string }
