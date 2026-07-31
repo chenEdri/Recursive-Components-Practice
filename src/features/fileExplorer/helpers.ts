@@ -34,12 +34,17 @@ function defaultNameBase(type: NodeType): string {
   return NEW_NODE_TITLE[type]
 }
 
-export function countDefaultNamedChildren(folder: FileSystemNode, type: NodeType): number {
-  const base = defaultNameBase(type)
-  return (folder.children ?? []).filter((child) => child.type === type && child.name.startsWith(base)).length
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-export function defaultName(type: NodeType, existingDefaultNamedCount: number): string {
+export function defaultName(folder: FileSystemNode, type: NodeType): string {
   const base = defaultNameBase(type)
-  return existingDefaultNamedCount === 0 ? base : `${base} (${existingDefaultNamedCount + 1})`
+  const pattern = new RegExp(`^${escapeRegExp(base)}(?: \\((\\d+)\\))?$`)
+  const count = (folder.children ?? []).filter((child) => child.type === type && pattern.test(child.name)).length
+  return count === 0 ? base : `${base} (${count + 1})`
+}
+
+export function isNameTaken(folder: FileSystemNode, name: string): boolean {
+  return (folder.children ?? []).some((child) => child.name === name)
 }

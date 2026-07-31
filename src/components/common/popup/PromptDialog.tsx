@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { KeyboardEvent } from 'react'
+import type { ChangeEvent, KeyboardEvent } from 'react'
 import { Button, ButtonSize, ButtonVariant } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import styles from './PromptDialog.module.scss'
@@ -17,13 +17,23 @@ export function PromptDialog({
   onCancel,
 }: PromptDialogProps) {
   const [value, setValue] = useState(defaultValue)
+  const [submitError, setSubmitError] = useState<string | undefined>(undefined)
 
   const trimmed = value.trim()
-  const validationError = trimmed.length > 0 ? validate?.(trimmed) : undefined
-  const isInvalid = trimmed.length === 0 || Boolean(validationError)
+  const isInvalid = trimmed.length === 0 || Boolean(submitError)
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value)
+    if (submitError) setSubmitError(undefined)
+  }
 
   const handleSubmit = () => {
     if (isInvalid) return
+    const validationError = validate?.(trimmed)
+    if (validationError) {
+      setSubmitError(validationError)
+      return
+    }
     onConfirm(trimmed)
   }
 
@@ -37,10 +47,10 @@ export function PromptDialog({
       <Input
         label={label}
         value={value}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        error={validationError ?? undefined}
+        error={submitError}
         autoFocus
       />
       <div className={styles.actions}>

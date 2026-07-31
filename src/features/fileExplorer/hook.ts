@@ -3,7 +3,7 @@ import { popupService } from '@/services/popupService'
 import { treeStorageService } from '@/services/treeStorageService'
 import { FileExplorerActionType, NEW_NODE_TITLE, NODE_NAME_FIELD_LABEL, NodeType } from './constants'
 import { initialData } from './data'
-import { countDefaultNamedChildren, defaultName, findNode, insertChild } from './helpers'
+import { defaultName, findNode, insertChild, isNameTaken } from './helpers'
 import type { FileExplorerAction, FileExplorerState, FileSystemNode } from './types'
 
 const initialState: FileExplorerState = {
@@ -62,13 +62,14 @@ export function useFileTreeManager() {
   const addNode = async (nodeType: NodeType) => {
     if (!selectedNode) return
     const parentId = selectedNode.id
-    const suggested = defaultName(nodeType, countDefaultNamedChildren(selectedNode, nodeType))
+    const suggested = defaultName(selectedNode, nodeType)
 
     const name = await popupService.prompt({
       title: NEW_NODE_TITLE[nodeType],
       label: NODE_NAME_FIELD_LABEL[nodeType],
       defaultValue: suggested,
       confirmText: 'Create',
+      validate: (value) => (isNameTaken(selectedNode, value) ? 'A file or folder with this name already exists' : undefined),
     })
     if (name === null) return
 
