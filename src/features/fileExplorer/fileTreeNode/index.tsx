@@ -10,6 +10,7 @@ export function FileTreeNode({ node, depth, expandedIds, selectedId, onToggle, o
 
   const handleToggle = (event: MouseEvent) => {
     event.stopPropagation()
+    onSelect(node.id)
     onToggle(node.id)
   }
 
