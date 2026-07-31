@@ -1,0 +1,20 @@
+@use '../../../styles/variables' as v;
+
+.wrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding-block: 1.5rem;
+}
+
+.spinner {
+  color: v.$color-gray-500;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

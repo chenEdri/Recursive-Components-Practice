@@ -1,0 +1,16 @@
+@use '../../styles/variables' as v;
+
+.page {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  background-color: v.$color-gray-50;
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+  padding: 1.5rem 1rem;
+}

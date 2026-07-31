@@ -1,0 +1,42 @@
+@use '../../../styles/variables' as v;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.label {
+  font-size: v.$font-size-sm;
+  font-weight: 500;
+  color: v.$color-gray-700;
+}
+
+.input {
+  border-radius: v.$radius-md;
+  border: 1px solid v.$color-gray-300;
+  padding: 0.5rem 0.75rem;
+  font-size: v.$font-size-sm;
+  color: v.$color-gray-900;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: border-color v.$transition-fast, box-shadow v.$transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: v.$color-blue-500;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+  }
+
+  &.hasError {
+    border-color: v.$color-red-500;
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35);
+    }
+  }
+}
+
+.error {
+  font-size: v.$font-size-sm;
+  color: v.$color-red-600;
+}
