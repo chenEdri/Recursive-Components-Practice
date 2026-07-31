@@ -30,21 +30,17 @@ export function findNode(root: FileSystemNode, id: string): FileSystemNode | und
   return undefined
 }
 
-function defaultNameBase(type: NodeType): string {
-  return NEW_NODE_TITLE[type]
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+export function isNameTaken(folder: FileSystemNode, name: string): boolean {
+  return (folder.children ?? []).some((child) => child.name === name)
 }
 
 export function defaultName(folder: FileSystemNode, type: NodeType): string {
-  const base = defaultNameBase(type)
-  const pattern = new RegExp(`^${escapeRegExp(base)}(?: \\((\\d+)\\))?$`)
-  const count = (folder.children ?? []).filter((child) => child.type === type && pattern.test(child.name)).length
-  return count === 0 ? base : `${base} (${count + 1})`
-}
+  const base = NEW_NODE_TITLE[type]
+  if (!isNameTaken(folder, base)) return base
 
-export function isNameTaken(folder: FileSystemNode, name: string): boolean {
-  return (folder.children ?? []).some((child) => child.name === name)
+  let suffix = 2
+  while (isNameTaken(folder, `${base} (${suffix})`)) {
+    suffix += 1
+  }
+  return `${base} (${suffix})`
 }
